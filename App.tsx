@@ -1,12 +1,15 @@
-import "./global.css";
-import { StatusBar } from "expo-status-bar";
-import { Text, View } from "react-native";
+import './global.css';
+import { StatusBar } from 'expo-status-bar';
+import { Text, View } from 'react-native';
+import Routes from './src/routes';
+import 'react-native-gesture-handler';
 
 export default function App() {
   return (
-    <View className="flex items-center justify-center grow">
-      <Text>Criando branch de develop</Text>
+    <>
+      <Routes />
+
       <StatusBar style="auto" />
-    </View>
+    </>
   );
 }
