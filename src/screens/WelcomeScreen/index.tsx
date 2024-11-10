@@ -8,7 +8,7 @@ import { RootStackParamList } from '../../routes';
 type WelcomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => (
-  <View className="flex-1 items-center justify-center bg-white">
+  <View className="flex-1 items-center justify-center bg-light-background dark:bg-dark-background">
     {/* <Image
       source={require('../../assets/logo.png')}
       className="mb-6 w-32 h-32"

@@ -1,4 +1,3 @@
-// src/navigation/AppNavigator.tsx
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -26,13 +25,13 @@ const Routes: React.FC = () => (
       <Stack.Screen
         name="Login"
         component={LoginScreen}
-        options={{ title: 'Login' }}
+        options={{ title: '' }}
       />
 
       <Stack.Screen
         name="Home"
         component={HomeScreen}
-        options={{ title: 'Home' }}
+        options={{ title: '', gestureEnabled: false }}
       />
     </Stack.Navigator>
   </NavigationContainer>

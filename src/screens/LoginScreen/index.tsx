@@ -17,7 +17,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   };
 
   return (
-    <View className="flex-1 items-center justify-center p-4 bg-white">
+    <View className="flex-1 items-center justify-center p-4 bg-light-background dark:bg-dark-background">
       <Text className="text-2xl font-semibold mb-8">Login</Text>
 
       <InputField
