@@ -1,6 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React, { useContext, useRef, useState, useEffect } from 'react';
 import { View, Dimensions, useColorScheme, Animated } from 'react-native';
-import { LineChart, PieChart } from 'react-native-chart-kit'; // Removido o StackedBarChart
+import { LineChart, PieChart } from 'react-native-chart-kit';
 import Selector, { IconOption } from '../../../../components/Selector';
 import Entypo from '@expo/vector-icons/Entypo';
 import { theme } from '../../../../themes';
@@ -8,41 +8,9 @@ import {
   GestureHandlerRootView,
   ScrollView,
 } from 'react-native-gesture-handler';
+import useItems from '../../../../contexts/hooks/useItems';
 
 const screenWidth = Dimensions.get('window').width;
-
-// Dados financeiros para os gráficos
-const chartData = {
-  line: {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-    datasets: [
-      {
-        data: [2000, 4500, 2800, 8000, 9900, 4300], // Exemplo de valores de receita
-        color: (opacity = 1) => theme.finance.income, // Receita
-      },
-      {
-        data: [1500, 3200, 2000, 5000, 7000, 3500], // Exemplo de valores de despesa
-        color: (opacity = 1) => theme.finance.expense, // Despesa
-      },
-    ],
-  },
-  pie: [
-    {
-      name: 'Receitas',
-      population: 60, // Exemplo de percentual
-      color: theme.finance.income, // Receita
-      legendFontColor: theme.light.textSecondary,
-      legendFontSize: 15,
-    },
-    {
-      name: 'Despesas',
-      population: 40, // Exemplo de percentual
-      color: theme.finance.expense, // Despesa
-      legendFontColor: theme.light.textSecondary,
-      legendFontSize: 15,
-    },
-  ],
-};
 
 const options: IconOption[] = [
   {
@@ -57,21 +25,83 @@ const options: IconOption[] = [
       <Entypo name="line-graph" size={24} color={theme.light.textPrimary} />
     ),
   },
-  // Comentado o gráfico de barras
-  // {
-  //   id: 'stackedBar',
-  //   icon: <Entypo name="bar-graph" size={24} color={theme.light.textPrimary} />,
-  // },
 ];
 
 const ChartViewer = () => {
+  const { getItemsByMonth, selectedMonth } = useItems();
   const [opacity] = useState(new Animated.Value(1));
   const scrollViewRef = useRef<ScrollView>(null);
   const scrollX = useRef(new Animated.Value(0)).current;
   const scheme = useColorScheme();
   const isDarkMode = scheme === 'dark';
-
   const [selectedChart, setSelectedChart] = useState<string>(options[0].id);
+  const [chartData, setChartData] = useState({ line: {}, pie: [] });
+
+  // Atualizar dados para o gráfico quando o mês ou dados do contexto mudarem
+  useEffect(() => {
+    console.log('selectedMonth: ', selectedMonth);
+    const items = getItemsByMonth(
+      selectedMonth,
+      new Date().getFullYear().toString()
+    );
+
+    console.log('items: ', JSON.stringify(items));
+
+    const days = Array.from(
+      new Set(items.map(item => new Date(item.date).getDate()))
+    );
+    const lineData = {
+      labels: days.map(day => String(day).padStart(2, '0')),
+      datasets: [
+        {
+          data: days.map(day => {
+            const incomeItems = items.filter(
+              item =>
+                new Date(item.date).getDate() === day && item.type === 'income'
+            );
+            return incomeItems.reduce((total, item) => total + item.amount, 0);
+          }),
+          color: () => theme.finance.income,
+        },
+        {
+          data: days.map(day => {
+            const expenseItems = items.filter(
+              item =>
+                new Date(item.date).getDate() === day && item.type === 'expense'
+            );
+            return expenseItems.reduce((total, item) => total + item.amount, 0);
+          }),
+          color: () => theme.finance.expense,
+        },
+      ],
+    };
+
+    const incomeTotal = items
+      .filter(item => item.type === 'income')
+      .reduce((total, item) => total + item.amount, 0);
+    const expenseTotal = items
+      .filter(item => item.type === 'expense')
+      .reduce((total, item) => total + item.amount, 0);
+
+    const pieData = [
+      {
+        name: 'Receitas',
+        population: incomeTotal,
+        color: theme.finance.income,
+        legendFontColor: theme.light.textSecondary,
+        legendFontSize: 15,
+      },
+      {
+        name: 'Despesas',
+        population: expenseTotal,
+        color: theme.finance.expense,
+        legendFontColor: theme.light.textSecondary,
+        legendFontSize: 15,
+      },
+    ];
+
+    setChartData({ line: lineData, pie: pieData });
+  }, [getItemsByMonth, selectedMonth]);
 
   const handleSelect = (selectedId: string) => {
     Animated.timing(opacity, {
@@ -80,9 +110,7 @@ const ChartViewer = () => {
       useNativeDriver: true,
     }).start(() => {
       setSelectedChart(selectedId);
-
       scrollViewRef.current?.scrollTo({ x: 0, animated: true });
-
       Animated.timing(opacity, {
         toValue: 1,
         duration: 150,
@@ -93,9 +121,7 @@ const ChartViewer = () => {
 
   const handleScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-    {
-      useNativeDriver: false,
-    }
+    { useNativeDriver: false }
   );
 
   const chartConfig = {
@@ -136,22 +162,9 @@ const ChartViewer = () => {
                   width={screenWidth}
                   height={220}
                   chartConfig={chartConfig}
-                  style={{ borderRadius: '1.5rem' }}
+                  style={{ borderRadius: 24 }}
                 />
               )}
-
-              {/* Comentado o gráfico de barras */}
-              {/* {selectedChart === 'stackedBar' && (
-                <StackedBarChart
-                  hideLegend={false}
-                  withHorizontalLabels={false}
-                  data={chartData.stackedBar}
-                  width={screenWidth}
-                  height={220}
-                  chartConfig={chartConfig}
-                />
-              )} */}
-
               {selectedChart === 'pie' && (
                 <PieChart
                   paddingLeft="0"
@@ -159,8 +172,8 @@ const ChartViewer = () => {
                   width={screenWidth}
                   height={220}
                   chartConfig={chartConfig}
-                  accessor={'population'}
-                  backgroundColor={'transparent'}
+                  accessor="population"
+                  backgroundColor="transparent"
                   absolute
                 />
               )}
