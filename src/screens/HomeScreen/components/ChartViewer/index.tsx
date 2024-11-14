@@ -10,6 +10,8 @@ import {
 } from 'react-native-gesture-handler';
 import useItems from '../../../../contexts/hooks/useItems';
 
+// TODO: Adicionar visualização quando não houverem dados no gráfico
+
 const screenWidth = Dimensions.get('window').width;
 
 const options: IconOption[] = [
@@ -37,7 +39,6 @@ const ChartViewer = () => {
   const [selectedChart, setSelectedChart] = useState<string>(options[0].id);
   const [chartData, setChartData] = useState({ line: {}, pie: [] });
 
-  // Atualizar dados para o gráfico quando o mês ou dados do contexto mudarem
   useEffect(() => {
     console.log('selectedMonth: ', selectedMonth);
     const items = getItemsByMonth(
