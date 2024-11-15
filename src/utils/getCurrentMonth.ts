@@ -1,4 +1,7 @@
-import { Month, MONTHS } from '../contexts/providers/itemsProvider';
+import {
+  Month,
+  MONTHS,
+} from '../contexts/providers/TransactionsProvider/types';
 
 export const getCurrentMonth = (): Month => {
   const monthIndex = new Date().getMonth();

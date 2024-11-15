@@ -1,15 +1,15 @@
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import {
-  FinancialItem,
+  Transaction,
   getMonthYearKey,
-} from '../contexts/providers/itemsProvider';
+} from '../contexts/providers/TransactionsProvider';
 
 const NAMESPACE = 'd9428888-122b-11e1-b85c-61cd3cbb3210';
 
 const organizeItemsByMonth = (
-  items: FinancialItem[]
-): { [key: string]: FinancialItem[] } => {
+  items: Transaction[]
+): { [key: string]: Transaction[] } => {
   return items.reduce(
     (acc, item) => {
       const monthYearKey = getMonthYearKey(item.date);
@@ -20,14 +20,12 @@ const organizeItemsByMonth = (
 
       return acc;
     },
-    {} as { [key: string]: FinancialItem[] }
+    {} as { [key: string]: Transaction[] }
   );
 };
 
-const generateMockItems = (
-  count: number
-): { [key: string]: FinancialItem[] } => {
-  const mockItems: FinancialItem[] = [];
+const generateMockItems = (count: number): { [key: string]: Transaction[] } => {
+  const mockItems: Transaction[] = [];
 
   const randomNames = [
     'Freelance Project',

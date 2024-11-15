@@ -9,7 +9,7 @@ export type IconOption = {
 type SelectorProps = {
   options: IconOption[];
   onSelect: (selectedId: string) => void;
-  selectedId?: string; // Prop para receber a opção selecionada externamente
+  selectedId?: string;
 };
 
 const Selector: React.FC<SelectorProps> = ({

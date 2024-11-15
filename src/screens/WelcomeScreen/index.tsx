@@ -1,11 +1,10 @@
 // src/screens/Welcome/WelcomeScreen.tsx
 import React from 'react';
-import { View, Text, Image } from 'react-native';
-import { Button } from '../../components/Button';
-import { NativeStackScreenProps } from 'react-native-screens/lib/typescript/native-stack/types';
-import { RootStackParamList } from '../../routes';
+import { View, Text } from 'react-native';
+import { Button } from '../../components/common/Button';
+import { ScreenProps } from '../../routes/types';
 
-type WelcomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
+type WelcomeScreenProps = ScreenProps<'Welcome'>;
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => (
   <View className="flex-1 items-center justify-center bg-light-background dark:bg-dark-background">

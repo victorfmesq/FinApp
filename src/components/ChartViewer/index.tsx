@@ -1,16 +1,21 @@
-import React, { useContext, useRef, useState, useEffect } from 'react';
-import { View, Dimensions, useColorScheme, Animated } from 'react-native';
+import React, {
+  useContext,
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+} from 'react';
+
 import { LineChart, PieChart } from 'react-native-chart-kit';
-import Selector, { IconOption } from '../../../../components/Selector';
 import Entypo from '@expo/vector-icons/Entypo';
-import { theme } from '../../../../themes';
 import {
   GestureHandlerRootView,
   ScrollView,
 } from 'react-native-gesture-handler';
-import useItems from '../../../../contexts/hooks/useItems';
-
-// TODO: Adicionar visualização quando não houverem dados no gráfico
+import Selector, { IconOption } from '../common/Selector';
+import useTransactions from '../../contexts/hooks/useTransactions';
+import { theme } from '../../themes';
+import { View, Text, Dimensions, Animated, useColorScheme } from 'react-native';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -30,7 +35,8 @@ const options: IconOption[] = [
 ];
 
 const ChartViewer = () => {
-  const { getItemsByMonth, selectedMonth } = useItems();
+  const { getTransactionsByMonth: getItemsByMonth, selectedMonth } =
+    useTransactions();
   const [opacity] = useState(new Animated.Value(1));
   const scrollViewRef = useRef<ScrollView>(null);
   const scrollX = useRef(new Animated.Value(0)).current;
@@ -38,6 +44,7 @@ const ChartViewer = () => {
   const isDarkMode = scheme === 'dark';
   const [selectedChart, setSelectedChart] = useState<string>(options[0].id);
   const [chartData, setChartData] = useState({ line: {}, pie: [] });
+  const [noDataAvailable, setNoDataAvailable] = useState(false);
 
   useEffect(() => {
     console.log('selectedMonth: ', selectedMonth);
@@ -47,6 +54,11 @@ const ChartViewer = () => {
     );
 
     console.log('items: ', JSON.stringify(items));
+
+    if (items.length === 0) {
+      setNoDataAvailable(true);
+      return; // If no data, skip chart data processing
+    }
 
     const days = Array.from(
       new Set(items.map(item => new Date(item.date).getDate()))
@@ -102,6 +114,7 @@ const ChartViewer = () => {
     ];
 
     setChartData({ line: lineData, pie: pieData });
+    setNoDataAvailable(false);
   }, [getItemsByMonth, selectedMonth]);
 
   const handleSelect = (selectedId: string) => {
@@ -138,8 +151,53 @@ const ChartViewer = () => {
       isDarkMode ? theme.dark.textPrimary : theme.light.textPrimary,
   };
 
+  // Define renderCharts function using useCallback with switch-case structure
+  const renderCharts = useCallback(() => {
+    if (noDataAvailable) {
+      return (
+        <View className="flex-1 items-center justify-center">
+          <Text style={{ color: theme.light.textPrimary, fontSize: 18 }}>
+            Nenhum dado disponível
+          </Text>
+          {/* <Image
+            source={require('../../../../assets/no-data-image.png')}
+            style={{ width: 150, height: 150, marginTop: 20 }}
+          /> */}
+        </View>
+      );
+    }
+
+    switch (selectedChart) {
+      case 'line':
+        return (
+          <LineChart
+            data={chartData.line}
+            width={screenWidth}
+            height={220}
+            chartConfig={chartConfig}
+            style={{ borderRadius: 24 }}
+          />
+        );
+      case 'pie':
+        return (
+          <PieChart
+            paddingLeft="0"
+            data={chartData.pie}
+            width={screenWidth}
+            height={220}
+            chartConfig={chartConfig}
+            accessor="population"
+            backgroundColor="transparent"
+            absolute
+          />
+        );
+      default:
+        return null;
+    }
+  }, [noDataAvailable, selectedChart, chartData, chartConfig]);
+
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView className="flex-1">
       <View className="flex-1 items-center justify-start pt-4 px-4 bg-light-background dark:bg-dark-background">
         <Selector
           options={options}
@@ -157,27 +215,7 @@ const ChartViewer = () => {
             ref={scrollViewRef}
           >
             <Animated.View style={{ width: screenWidth, opacity }}>
-              {selectedChart === 'line' && (
-                <LineChart
-                  data={chartData.line}
-                  width={screenWidth}
-                  height={220}
-                  chartConfig={chartConfig}
-                  style={{ borderRadius: 24 }}
-                />
-              )}
-              {selectedChart === 'pie' && (
-                <PieChart
-                  paddingLeft="0"
-                  data={chartData.pie}
-                  width={screenWidth}
-                  height={220}
-                  chartConfig={chartConfig}
-                  accessor="population"
-                  backgroundColor="transparent"
-                  absolute
-                />
-              )}
+              {renderCharts()}
             </Animated.View>
           </ScrollView>
         </View>

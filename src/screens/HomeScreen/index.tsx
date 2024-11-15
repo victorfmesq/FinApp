@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, View } from 'react-native';
-import ChartViewer from './components/ChartViewer';
+import ChartViewer from '../../components/ChartViewer';
 
 const HomeScreen = () => {
   return (

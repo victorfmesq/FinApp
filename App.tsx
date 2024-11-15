@@ -3,15 +3,17 @@ import { StatusBar } from 'expo-status-bar';
 
 import './global.css';
 import Routes from './src/routes';
-import ItemsProvider from './src/contexts/providers/itemsProvider';
-import { useStorage } from './src/store/useStorage';
+import TransactionsProvider from './src/contexts/providers/TransactionsProvider';
+import { NavigationContainer } from '@react-navigation/native';
 
 export default function App() {
   return (
-    <ItemsProvider>
-      <Routes />
+    <TransactionsProvider>
+      <NavigationContainer>
+        <Routes />
+      </NavigationContainer>
 
       <StatusBar style="auto" />
-    </ItemsProvider>
+    </TransactionsProvider>
   );
 }

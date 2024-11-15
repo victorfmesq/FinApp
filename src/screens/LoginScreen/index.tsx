@@ -1,19 +1,18 @@
 // src/screens/Login/LoginScreen.tsx
 import React, { useState } from 'react';
 import { View, Text } from 'react-native';
-import { RootStackParamList } from '../../routes';
-import { NativeStackScreenProps } from 'react-native-screens/lib/typescript/native-stack/types';
-import { InputField } from '../../components/InputField';
-import { Button } from '../../components/Button';
+import { InputField } from '../../components/common/InputField';
+import { Button } from '../../components/common/Button';
+import { RootStackScreens, ScreenProps } from '../../routes/types';
 
-type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
+type LoginScreenProps = ScreenProps<'Login'>;
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
   const handleLogin = () => {
-    navigation.navigate('Home');
+    navigation.navigate('HomeTabs', { screen: 'Home' });
   };
 
   return (
