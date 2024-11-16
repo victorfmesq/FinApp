@@ -33,7 +33,7 @@ const TabRoutes: React.FC = () => (
       return {
         tabBarStyle: {
           backgroundColor: '#fff',
-          borderTopWidth: 0,
+          borderTopWidth: 1,
         },
         tabBarIcon: ({ color, size }) => (
           <IconComponent size={size * 1.1} color={color} />
@@ -45,6 +45,7 @@ const TabRoutes: React.FC = () => (
   >
     {Object.entries(TAB).map(([key, { screen }]) => (
       <Tab.Screen
+        key={key}
         name={key}
         component={screen}
         options={{

@@ -43,33 +43,30 @@ const ChartViewer = () => {
   const scrollViewRef = useRef<ScrollView>(null);
   const scrollX = useRef(new Animated.Value(0)).current;
 
-  const { getTransactionsByMonth: getItemsByMonth, selectedMonth } =
-    useTransactions();
+  const { getTransactionsByMonth, selectedMonth } = useTransactions();
 
   const { opacity, transitionChart } = useChartTransition(300);
 
   const isDarkMode = useColorScheme() === 'dark';
   const chartConfig = getChartConfig(isDarkMode);
 
-  useEffect(() => {
-    console.log('selectedMonth: ', selectedMonth);
+  useEffect(() => loadData(), [getTransactionsByMonth, selectedMonth]);
 
-    const items = getItemsByMonth(
+  const loadData = useCallback(() => {
+    const transactions = getTransactionsByMonth(
       selectedMonth,
       new Date().getFullYear().toString()
     );
 
-    console.log('items: ', JSON.stringify(items));
-
-    if (items.length === 0) {
+    if (transactions.length === 0) {
       return;
     }
 
-    const lineData = calculateLineData(items);
-    const pieData = calculatePieData(items);
+    const lineData = calculateLineData(transactions);
+    const pieData = calculatePieData(transactions);
 
     setChartData({ line: lineData, pie: pieData });
-  }, [getItemsByMonth, selectedMonth]);
+  }, [getTransactionsByMonth, selectedMonth]);
 
   const handleSelect = (selectedId: string) => {
     transitionChart(() => {
@@ -129,14 +126,14 @@ const ChartViewer = () => {
 
   return (
     <GestureHandlerRootView className="flex-1">
-      <View className="flex-1 items-center justify-start pt-4 px-4 bg-light-background dark:bg-dark-background">
+      <View className="gap-3 flex-1 items-center justify-start pt-2 bg-light-background dark:bg-dark-background">
         <Selector
           options={options}
           onSelect={handleSelect}
           selectedId={selectedChart}
         />
 
-        <View className="mt-4 w-full items-center bg-light-surface dark:bg-dark-surface rounded-3xl">
+        <View className="overflow-hidden w-full items-center bg-light-surface dark:bg-dark-surface rounded-3xl">
           <ScrollView
             horizontal
             pagingEnabled

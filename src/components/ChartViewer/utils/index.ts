@@ -76,9 +76,7 @@ export const calculatePieData = (items: Transaction[]) => {
 export const getChartConfig = (isDarkMode: boolean) => ({
   backgroundColor: isDarkMode ? theme.dark.surface : theme.light.surface,
   backgroundGradientFrom: isDarkMode ? theme.dark.surface : theme.light.surface,
-  backgroundGradientTo: isDarkMode
-    ? theme.dark.background
-    : theme.light.background,
+  backgroundGradientTo: isDarkMode ? theme.dark.surface : theme.light.surface,
   color: () => (isDarkMode ? theme.dark.primary : theme.light.primary),
   labelColor: () =>
     isDarkMode ? theme.dark.textPrimary : theme.light.textPrimary,
