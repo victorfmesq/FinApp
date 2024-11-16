@@ -36,7 +36,7 @@ const TabRoutes: React.FC = () => (
           borderTopWidth: 0,
         },
         tabBarIcon: ({ color, size }) => (
-          <IconComponent size={size} color={color} />
+          <IconComponent size={size * 1.1} color={color} />
         ),
         tabBarActiveTintColor: theme.dark.primary,
         tabBarInactiveTintColor: '#aaa',
@@ -45,14 +45,13 @@ const TabRoutes: React.FC = () => (
   >
     {Object.entries(TAB).map(([key, { screen }]) => (
       <Tab.Screen
-        key={key}
         name={key}
         component={screen}
         options={{
           header: () => (
-            <View className="flex items-center justify-center h-10 bg-light-primary">
+            <View className="flex items-center justify-end h-20 bg-light-primary rounded-b-2xl">
               <Text className="text-2xl font-semibold text-white mb-4">
-                {key} Header
+                {key}
               </Text>
             </View>
           ),
