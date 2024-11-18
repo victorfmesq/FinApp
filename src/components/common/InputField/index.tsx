@@ -13,7 +13,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   ...props
 }) => (
   <TextInput
-    className="w-full py-2 px-4 border border-gray-300 rounded-lg mb-4"
+    className="w-full h-12 py-2 px-4 border bg-light-surface dark:bg-dark-surface border-gray-400 rounded-lg mb-4"
     value={value}
     onChangeText={onChangeText}
     {...props}

@@ -1,9 +1,7 @@
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
-import {
-  Transaction,
-  getMonthYearKey,
-} from '../contexts/providers/TransactionsProvider';
+import { getMonthYearKey } from '../contexts/providers/TransactionsProvider';
+import { Transaction } from '../contexts/providers/TransactionsProvider/types';
 
 const NAMESPACE = 'd9428888-122b-11e1-b85c-61cd3cbb3210';
 

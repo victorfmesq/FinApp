@@ -43,6 +43,7 @@ const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
 
   const initializeTransactions = async () => {
     try {
+      // (async () => await removeData())();
       const existingItems = await loadData();
 
       if (!existingItems || Object.keys(existingItems).length === 0) {
@@ -52,8 +53,6 @@ const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
         setTransactions(mockItems);
         saveData(mockItems);
       } else {
-        (async () => await removeData())();
-
         console.log('lendo dados ja existentes');
         setTransactions(existingItems);
       }
@@ -77,6 +76,10 @@ const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
       if (!updatedItems[monthYearKey]) updatedItems[monthYearKey] = [];
 
       updatedItems[monthYearKey].push(item);
+
+      updatedItems[monthYearKey] = updatedItems[monthYearKey].sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      );
 
       saveData(updatedItems);
 
