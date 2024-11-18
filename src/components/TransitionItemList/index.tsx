@@ -48,7 +48,11 @@ const transformTransactions = (
     .reverse();
 };
 
-const TransitionItemList = () => {
+const TransitionItemList = ({
+  variant = 'read',
+}: {
+  variant: 'read' | 'manage';
+}) => {
   const { getTransactionsByMonth, selectedMonth } = useTransactions();
 
   const transactionItems = transformTransactions(
@@ -57,7 +61,7 @@ const TransitionItemList = () => {
 
   return (
     <FlatList
-      className="flex-1 mt-20 bg-light-surface dark:bg-dark-surface rounded-t-3xl"
+      className="flex-1 bg-light-surface dark:bg-dark-surface rounded-t-3xl"
       data={transactionItems}
       keyExtractor={item => item.id}
       renderItem={({ item }) => (
@@ -68,9 +72,10 @@ const TransitionItemList = () => {
           type={item.type}
           value={item.value}
           date={item.date}
+          variant={variant}
         />
       )}
-      contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}
+      contentContainerStyle={{ gap: 8 }}
     />
   );
 };

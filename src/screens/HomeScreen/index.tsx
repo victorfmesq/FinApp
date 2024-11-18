@@ -8,7 +8,9 @@ const HomeScreen = () => {
     <View className="flex-1 bg-light-background px-2">
       <ChartViewer />
 
-      <TransitionItemList />
+      <View className="flex-1 mt-20">
+        <TransitionItemList variant="read" />
+      </View>
     </View>
   );
 };
