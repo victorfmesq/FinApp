@@ -4,11 +4,13 @@ import {
   StackScreenProps,
 } from '@react-navigation/stack';
 import { TabKey } from './components/TabRoutes/types';
+import { Transaction } from '../contexts/providers/TransactionsProvider/types';
 
 export type RootStackParamList = {
   Welcome: undefined;
   Login: undefined;
   HomeTabs: { screen: TabKey };
+  Edit: { transaction: Transaction };
 };
 
 export type StackScreenNames = keyof RootStackParamList;

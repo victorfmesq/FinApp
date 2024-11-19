@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -14,17 +14,11 @@ import { InputField } from '../../components/common/InputField';
 import { Button } from '../../components/common/Button';
 import { v4 as uuidv4 } from 'uuid';
 import useTransactions from '../../contexts/hooks/useTransactions';
-
-type Transaction = {
-  id: string;
-  name: string;
-  amount: number;
-  type: 'income' | 'expense';
-  date: Date;
-};
+import { Transaction } from '../../contexts/providers/TransactionsProvider/types';
+import { useNavigation } from '@react-navigation/native';
 
 type TransactionFormScreenProps = {
-  transaction?: Transaction; // `transaction` será opcional
+  transaction?: Transaction;
 };
 
 const TransactionFormScreen: React.FC<TransactionFormScreenProps> = ({
@@ -37,6 +31,7 @@ const TransactionFormScreen: React.FC<TransactionFormScreenProps> = ({
   const [showTypeSelector, setShowTypeSelector] = useState<boolean>(false);
 
   const { addTransaction, updateTransaction } = useTransactions();
+  const { goBack } = useNavigation();
 
   useEffect(() => {
     if (transaction) {
@@ -86,6 +81,8 @@ const TransactionFormScreen: React.FC<TransactionFormScreenProps> = ({
     updateTransaction(transaction.id, updatedTransaction);
 
     Alert.alert('Sucesso', 'Transação atualizada com sucesso!');
+
+    goBack();
   };
 
   const resetForm = () => {
@@ -96,6 +93,19 @@ const TransactionFormScreen: React.FC<TransactionFormScreenProps> = ({
   };
 
   const isEditing = !!transaction;
+
+  const isDisabled = useMemo(() => {
+    const disableCreation = name === '' || amount === 0;
+
+    const disabledEdition =
+      isEditing &&
+      name === transaction.name &&
+      amount === transaction.amount &&
+      type === transaction.type &&
+      new Date(date).getTime() === new Date(transaction.date).getTime();
+
+    return disableCreation || disabledEdition;
+  }, [isEditing, transaction, name, amount, type, date]);
 
   return (
     <KeyboardAvoidingView
@@ -110,7 +120,7 @@ const TransactionFormScreen: React.FC<TransactionFormScreenProps> = ({
         <InputField
           placeholder="Nome da transação"
           value={name}
-          onChangeText={setName}
+          onChangeText={text => setName(text.trim())}
         />
 
         <InputField
@@ -183,6 +193,7 @@ const TransactionFormScreen: React.FC<TransactionFormScreenProps> = ({
                 </TouchableOpacity>
 
                 <Button
+                  style={{ backgroundColor: '#c5c5c5' }}
                   title="Cancelar"
                   onPress={() => setShowTypeSelector(false)}
                 />
@@ -206,7 +217,8 @@ const TransactionFormScreen: React.FC<TransactionFormScreenProps> = ({
         </View>
 
         <Button
-          title={isEditing ? 'Atualizar Transação' : 'Adicionar Transação'}
+          disabled={isDisabled}
+          title="Confirmar"
           onPress={isEditing ? handleEditTransaction : handleAddTransaction}
         />
       </ScrollView>

@@ -1,26 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Animated, TouchableOpacity } from 'react-native';
 import Entypo from '@expo/vector-icons/Entypo';
-import { opacity } from 'react-native-reanimated/lib/typescript/Colors';
+import { Transaction } from '../../../contexts/providers/TransactionsProvider/types';
 
 // TODO: Refatorar esse componente mais pra frente
-export interface TransitionItemProps {
-  type: 'income' | 'expense';
-  name: string;
+export interface TransactionItemProps extends Transaction {
   percent: number;
-  value: number;
-  date: Date;
   isSelected: boolean;
   variant?: 'read' | 'manage';
   onEdit?: () => void;
   onDelete?: () => void;
 }
 
-const TransitionItem: React.FC<TransitionItemProps> = ({
+const TransactionItem: React.FC<TransactionItemProps> = ({
   type,
   name,
   percent,
-  value,
+  amount,
   date,
   variant = 'read',
   isSelected,
@@ -30,21 +26,21 @@ const TransitionItem: React.FC<TransitionItemProps> = ({
   const [animationValue] = useState(new Animated.Value(1));
   const translateX = useRef(new Animated.Value(100)).current;
 
-  const formattedValue = `R$ ${value.toFixed(2).replace('.', ',')}`;
+  const formattedValue = `R$ ${amount.toFixed(2).replace('.', ',')}`;
   const formattedPercent = `${percent.toFixed(2)}%`;
 
   const dayOfMonth = date ? new Date(date).getDate() : null;
 
   useEffect(() => {
     Animated.timing(animationValue, {
-      toValue: !isSelected ? 1 : 0.7,
+      toValue: isSelected ? 0.7 : 1,
       duration: 200,
       useNativeDriver: false,
     }).start();
 
     Animated.timing(translateX, {
       toValue: isSelected ? 0 : 100,
-      duration: 300,
+      duration: 200,
       useNativeDriver: true,
     }).start();
   }, [isSelected]);
@@ -103,7 +99,6 @@ const TransitionItem: React.FC<TransitionItemProps> = ({
         <Animated.View
           style={{
             transform: [{ translateX }],
-            opacity: isSelected ? 1 : 0, // Ajusta a opacidade também
           }}
           className={`flex items-center justify-between rounded absolute right-0 h-full -translate-y-1/2 flex-row space-x-3 gap-4 bg-light-background`}
         >
@@ -120,4 +115,4 @@ const TransitionItem: React.FC<TransitionItemProps> = ({
   );
 };
 
-export default TransitionItem;
+export default TransactionItem;

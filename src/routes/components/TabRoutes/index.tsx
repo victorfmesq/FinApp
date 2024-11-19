@@ -5,8 +5,8 @@ import HomeScreen from '../../../screens/HomeScreen';
 import { TabKey, TabValue } from './types';
 import { View, Text } from 'react-native';
 import { theme } from '../../../themes';
-import TransactionFormScreen from '../../../screens/TransactionFormScreen';
 import ManageTransactionsScreen from '../../../screens/ManageTransactionsScreen';
+import AddScreen from '../../../screens/AddScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -17,7 +17,7 @@ const TAB: Record<TabKey, TabValue> = {
   },
   Add: {
     icon: (props: any) => <AntDesign name="pluscircleo" {...props} />,
-    screen: TransactionFormScreen,
+    screen: AddScreen,
   },
   Transactions: {
     icon: (props: any) => <Entypo name="list" {...props} />,
