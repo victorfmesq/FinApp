@@ -92,9 +92,11 @@ const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
       const updatedItems = { ...prevItems };
 
       Object.keys(updatedItems).forEach(monthYearKey => {
-        updatedItems[monthYearKey] = updatedItems[monthYearKey].map(item =>
-          item.id === id ? { ...item, ...updatedItem } : item
-        );
+        updatedItems[monthYearKey] = updatedItems[monthYearKey]
+          .map(item => (item.id === id ? { ...item, ...updatedItem } : item))
+          .sort(
+            (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+          );
       });
 
       saveData(updatedItems);

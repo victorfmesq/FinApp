@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -15,14 +15,37 @@ import { Button } from '../../components/common/Button';
 import { v4 as uuidv4 } from 'uuid';
 import useTransactions from '../../contexts/hooks/useTransactions';
 
-const AddTransactionScreen = () => {
+type Transaction = {
+  id: string;
+  name: string;
+  amount: number;
+  type: 'income' | 'expense';
+  date: Date;
+};
+
+type TransactionFormScreenProps = {
+  transaction?: Transaction; // `transaction` será opcional
+};
+
+const TransactionFormScreen: React.FC<TransactionFormScreenProps> = ({
+  transaction,
+}) => {
   const [name, setName] = useState<string>('');
   const [amount, setAmount] = useState<number>(0);
   const [type, setType] = useState<'income' | 'expense'>('income');
   const [date, setDate] = useState<Date>(new Date());
   const [showTypeSelector, setShowTypeSelector] = useState<boolean>(false);
 
-  const { addTransaction } = useTransactions();
+  const { addTransaction, updateTransaction } = useTransactions();
+
+  useEffect(() => {
+    if (transaction) {
+      setName(transaction.name);
+      setAmount(transaction.amount);
+      setType(transaction.type);
+      setDate(new Date(transaction.date));
+    }
+  }, [transaction]);
 
   const handleAddTransaction = () => {
     if (!name || !amount || amount <= 0) {
@@ -30,7 +53,7 @@ const AddTransactionScreen = () => {
       return;
     }
 
-    const transaction = {
+    const newTransaction = {
       id: uuidv4(),
       name,
       amount: Number(amount),
@@ -38,14 +61,41 @@ const AddTransactionScreen = () => {
       date,
     };
 
-    console.log('Nova transação:', transaction);
-    addTransaction(transaction);
+    addTransaction(newTransaction);
+
     Alert.alert('Sucesso', 'Transação adicionada com sucesso!');
+    resetForm();
+  };
+
+  const handleEditTransaction = () => {
+    if (!transaction) return;
+
+    if (!name || !amount || amount <= 0) {
+      Alert.alert('Erro', 'Por favor, preencha todos os campos corretamente.');
+      return;
+    }
+
+    const updatedTransaction = {
+      ...transaction,
+      name,
+      amount: Number(amount),
+      type,
+      date,
+    };
+
+    updateTransaction(transaction.id, updatedTransaction);
+
+    Alert.alert('Sucesso', 'Transação atualizada com sucesso!');
+  };
+
+  const resetForm = () => {
     setName('');
     setAmount(0);
     setType('income');
     setDate(new Date());
   };
+
+  const isEditing = !!transaction;
 
   return (
     <KeyboardAvoidingView
@@ -54,7 +104,7 @@ const AddTransactionScreen = () => {
     >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="p-4">
         <Text className="text-xl font-bold mb-6 text-center">
-          Adicionar Transação
+          {isEditing ? 'Editar Transação' : 'Adicionar Transação'}
         </Text>
 
         <InputField
@@ -72,11 +122,7 @@ const AddTransactionScreen = () => {
           })}
           onChangeText={text => {
             const numericValue = text.replace(/\D/g, '');
-
             const formattedValue = Number(numericValue) / 100;
-
-            console.log(formattedValue);
-
             setAmount(formattedValue);
           }}
         />
@@ -159,10 +205,13 @@ const AddTransactionScreen = () => {
           />
         </View>
 
-        <Button title="Adicionar Transação" onPress={handleAddTransaction} />
+        <Button
+          title={isEditing ? 'Atualizar Transação' : 'Adicionar Transação'}
+          onPress={isEditing ? handleEditTransaction : handleAddTransaction}
+        />
       </ScrollView>
     </KeyboardAvoidingView>
   );
 };
 
-export default AddTransactionScreen;
+export default TransactionFormScreen;

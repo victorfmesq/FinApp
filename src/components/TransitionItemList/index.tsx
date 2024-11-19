@@ -1,8 +1,11 @@
-import React from 'react';
-import { FlatList } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { Alert, FlatList, TouchableOpacity } from 'react-native';
 import TransitionItem from './TransitionItem';
 import useTransactions from '../../contexts/hooks/useTransactions';
 import { Transaction } from '../../contexts/providers/TransactionsProvider/types';
+import { useNavigation } from '@react-navigation/native';
+
+// TODO: refatorar o componente
 
 interface TransitionItem {
   id: string;
@@ -53,10 +56,42 @@ const TransitionItemList = ({
 }: {
   variant: 'read' | 'manage';
 }) => {
-  const { getTransactionsByMonth, selectedMonth } = useTransactions();
+  const [selected, setSelected] = useState<string>('');
+  const { getTransactionsByMonth, selectedMonth, deleteTransaction } =
+    useTransactions();
 
   const transactionItems = transformTransactions(
     getTransactionsByMonth(selectedMonth, new Date().getFullYear().toString())
+  );
+
+  const onDeleteItem = useCallback(
+    (transactionId: string) => {
+      Alert.alert(
+        'Atenção!',
+        'Deseja excluir a transação?',
+        [
+          {
+            text: 'Cancelar',
+            onPress: () => console.log('Cancelado'),
+            style: 'cancel',
+          },
+          {
+            text: 'Confirmar',
+            onPress: () => {
+              deleteTransaction(transactionId);
+            },
+            style: 'destructive',
+          },
+        ],
+        { cancelable: true }
+      );
+    },
+    [deleteTransaction]
+  );
+
+  const onEdit = useCallback(
+    () => Alert.alert('Ops!', 'Tem que implementar ainda!'),
+    []
   );
 
   return (
@@ -65,15 +100,25 @@ const TransitionItemList = ({
       data={transactionItems}
       keyExtractor={item => item.id}
       renderItem={({ item }) => (
-        <TransitionItem
-          key={item.id}
-          name={item.name}
-          percent={item.percent}
-          type={item.type}
-          value={item.value}
-          date={item.date}
-          variant={variant}
-        />
+        <TouchableOpacity
+          onPress={() =>
+            variant === 'manage' &&
+            setSelected(current => (current === item.id ? '' : item.id))
+          }
+        >
+          <TransitionItem
+            key={item.id}
+            name={item.name}
+            percent={item.percent}
+            type={item.type}
+            value={item.value}
+            date={item.date}
+            variant={variant}
+            isSelected={selected === item.id}
+            onDelete={() => onDeleteItem(item.id)}
+            onEdit={() => onEdit()}
+          />
+        </TouchableOpacity>
       )}
       contentContainerStyle={{ gap: 8 }}
     />

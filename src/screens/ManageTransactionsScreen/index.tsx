@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import TransitionItemList from '../../components/TransitionItemList';
 
-const ManageItemsScreen = () => {
+const ManageTransactionsScreen = () => {
   return (
     <View className="flex-1 w-full">
       <TransitionItemList variant="manage" />
@@ -10,4 +10,4 @@ const ManageItemsScreen = () => {
   );
 };
 
-export default ManageItemsScreen;
+export default ManageTransactionsScreen;
