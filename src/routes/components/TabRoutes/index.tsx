@@ -3,12 +3,14 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Entypo, AntDesign } from '@expo/vector-icons'; // Adicione outros ícones conforme necessário
 import HomeScreen from '../../../screens/HomeScreen';
 import { TabKey, TabValue } from './types';
-import { View, Text } from 'react-native';
 import { theme } from '../../../themes';
 import ManageTransactionsScreen from '../../../screens/ManageTransactionsScreen';
 import AddScreen from '../../../screens/AddScreen';
+import Header from '../../../components/Header/TabRoutesHeader';
 
 const Tab = createBottomTabNavigator();
+
+// TODO: Utilizar um Header Global ver como fazer
 
 const TAB: Record<TabKey, TabValue> = {
   Home: {
@@ -49,13 +51,7 @@ const TabRoutes: React.FC = () => (
         name={key}
         component={screen}
         options={{
-          header: () => (
-            <View className="flex items-center justify-end h-20 bg-light-primary rounded-b-2xl">
-              <Text className="text-2xl font-semibold text-white mb-4">
-                {key}
-              </Text>
-            </View>
-          ),
+          header: () => <Header title={key} />,
         }}
       />
     ))}
