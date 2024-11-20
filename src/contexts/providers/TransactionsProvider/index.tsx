@@ -4,6 +4,7 @@ import React, {
   ReactNode,
   useMemo,
   useEffect,
+  useCallback,
 } from 'react';
 
 import { useStorage } from '../../../store/useStorage';
@@ -15,11 +16,14 @@ export const STORAGE_KEY = '@transactions';
 
 interface TransactionContextProps {
   transactions: { [key: string]: Transaction[] };
+  currentTransactions: Transaction[];
   selectedMonth: Month;
+  selectedYear: string;
+  handleSelectMonth: (month: Month) => void;
+  handleSelectYear: (year: string) => void;
   addTransaction: (item: Transaction) => void;
   updateTransaction: (id: string, updatedItem: Partial<Transaction>) => void;
   deleteTransaction: (id: string) => void;
-  getTransactionsByMonth: (month: Month, year: string) => Transaction[];
 }
 
 export const getMonthYearKey = (date: Date) =>
@@ -36,6 +40,9 @@ const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
     [key: string]: Transaction[];
   }>({});
   const [selectedMonth, setSelectedMonth] = useState<Month>(getCurrentMonth());
+  const [selectedYear, setSelectedYear] = useState<string>(
+    new Date().getFullYear().toString()
+  );
 
   const { saveData, loadData, removeData } = useStorage<{
     [key: string]: Transaction[];
@@ -43,17 +50,14 @@ const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
 
   const initializeTransactions = async () => {
     try {
-      // (async () => await removeData())();
       const existingItems = await loadData();
 
       if (!existingItems || Object.keys(existingItems).length === 0) {
-        console.log('gerando dados');
-        const mockItems = generateMockItems(100);
+        // const mockItems = generateMockItems(100);
 
-        setTransactions(mockItems);
-        saveData(mockItems);
+        setTransactions([]);
+        saveData([]);
       } else {
-        console.log('lendo dados ja existentes');
         setTransactions(existingItems);
       }
     } catch (e) {
@@ -65,9 +69,15 @@ const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
     (async () => await initializeTransactions())();
   }, []);
 
-  console.log('items :>> ', Object.values(transactions).flatMap(i => i).length);
+  const handleSelectMonth = useCallback((month: Month) => {
+    setSelectedMonth(month);
+  }, []);
 
-  const addTransaction = (item: Transaction) => {
+  const handleSelectYear = useCallback((year: string) => {
+    setSelectedYear(year);
+  }, []);
+
+  const addTransaction = useCallback((item: Transaction) => {
     setTransactions(prevItems => {
       const monthYearKey = getMonthYearKey(item.date);
 
@@ -85,27 +95,30 @@ const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
 
       return updatedItems;
     });
-  };
+  }, []);
 
-  const updateTransaction = (id: string, updatedItem: Partial<Transaction>) => {
-    setTransactions(prevItems => {
-      const updatedItems = { ...prevItems };
+  const updateTransaction = useCallback(
+    (id: string, updatedItem: Partial<Transaction>) => {
+      setTransactions(prevItems => {
+        const updatedItems = { ...prevItems };
 
-      Object.keys(updatedItems).forEach(monthYearKey => {
-        updatedItems[monthYearKey] = updatedItems[monthYearKey]
-          .map(item => (item.id === id ? { ...item, ...updatedItem } : item))
-          .sort(
-            (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-          );
+        Object.keys(updatedItems).forEach(monthYearKey => {
+          updatedItems[monthYearKey] = updatedItems[monthYearKey]
+            .map(item => (item.id === id ? { ...item, ...updatedItem } : item))
+            .sort(
+              (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+            );
+        });
+
+        saveData(updatedItems);
+
+        return updatedItems;
       });
+    },
+    []
+  );
 
-      saveData(updatedItems);
-
-      return updatedItems;
-    });
-  };
-
-  const deleteTransaction = (id: string) => {
+  const deleteTransaction = useCallback((id: string) => {
     setTransactions(prevItems => {
       const updatedItems = { ...prevItems };
 
@@ -119,33 +132,36 @@ const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
 
       return updatedItems;
     });
-  };
+  }, []);
 
-  const getTransactionsByMonth = (
-    month: Month,
-    year: string
-  ): Transaction[] => {
-    const key = `${MONTHS[month]}-${year}`;
+  const currentTransactions: Transaction[] = useMemo(() => {
+    const key = `${MONTHS[selectedMonth]}-${selectedYear}`;
 
     return transactions[key] || [];
-  };
+  }, [transactions, selectedMonth, selectedYear]);
 
   const value = useMemo(
     () => ({
+      currentTransactions,
       transactions,
       selectedMonth,
+      selectedYear,
       addTransaction,
       updateTransaction,
       deleteTransaction,
-      getTransactionsByMonth,
+      handleSelectMonth,
+      handleSelectYear,
     }),
     [
+      currentTransactions,
       transactions,
       selectedMonth,
+      selectedYear,
       addTransaction,
       updateTransaction,
       deleteTransaction,
-      getTransactionsByMonth,
+      handleSelectMonth,
+      handleSelectYear,
     ]
   );
 

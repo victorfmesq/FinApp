@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, Animated } from 'react-native';
-import { theme } from '../../../themes';
 import useGrowIconAnimation from '../../../hooks/animations/useGrowIconAnimation';
 import useSlideBackgroundAnimation from '../../../hooks/animations/useSlideBackgroundAnimation';
 
@@ -13,22 +12,6 @@ type SelectorProps = {
   options: IconOption[];
   onSelect: (selectedId: string) => void;
   selectedId?: string;
-};
-
-const animateBackgroundPosition = (
-  id: string,
-  options: IconOption[],
-  backgroundAnim: Animated.Value
-) => {
-  const optionIndex = options.findIndex(option => option.id === id);
-
-  const weight = optionIndex === 0 ? optionIndex - 1 : optionIndex;
-
-  Animated.spring(backgroundAnim, {
-    toValue: weight * (80 / options.length),
-    friction: 6,
-    useNativeDriver: false,
-  }).start();
 };
 
 const Selector: React.FC<SelectorProps> = ({

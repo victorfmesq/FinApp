@@ -1,17 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const useStorage = <T>(key: string, initialValue: T) => {
-  const [storedValue, setStoredValue] = useState<T>(initialValue);
-
   const loadData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem(key);
 
       const result =
         jsonValue != null ? (JSON.parse(jsonValue) as T) : initialValue;
-
-      setStoredValue(result);
 
       return result;
     } catch (error) {
@@ -24,8 +20,6 @@ export const useStorage = <T>(key: string, initialValue: T) => {
       const jsonValue = JSON.stringify(value);
 
       await AsyncStorage.setItem(key, jsonValue);
-
-      setStoredValue(value);
     } catch (error) {
       console.error(`Error saving data for key ${key}:`, error);
     }
@@ -34,16 +28,10 @@ export const useStorage = <T>(key: string, initialValue: T) => {
   const removeData = async () => {
     try {
       await AsyncStorage.removeItem(key);
-
-      setStoredValue(initialValue);
     } catch (error) {
       console.error(`Error removing data for key ${key}:`, error);
     }
   };
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  return { storedValue, saveData, removeData, loadData };
+  return { saveData, removeData, loadData };
 };

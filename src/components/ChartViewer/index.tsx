@@ -43,30 +43,25 @@ const ChartViewer = () => {
   const scrollViewRef = useRef<ScrollView>(null);
   const scrollX = useRef(new Animated.Value(0)).current;
 
-  const { getTransactionsByMonth, selectedMonth } = useTransactions();
+  const { currentTransactions } = useTransactions();
 
   const { opacity, transitionChart } = useChartTransition(300);
 
   const isDarkMode = useColorScheme() === 'dark';
   const chartConfig = getChartConfig(isDarkMode);
 
-  useEffect(() => loadData(), [getTransactionsByMonth, selectedMonth]);
+  useEffect(() => loadData(), [currentTransactions]);
 
   const loadData = useCallback(() => {
-    const transactions = getTransactionsByMonth(
-      selectedMonth,
-      new Date().getFullYear().toString()
-    );
-
-    if (transactions.length === 0) {
+    if (currentTransactions.length === 0) {
       return;
     }
 
-    const lineData = calculateLineData(transactions);
-    const pieData = calculatePieData(transactions);
+    const lineData = calculateLineData(currentTransactions);
+    const pieData = calculatePieData(currentTransactions);
 
     setChartData({ line: lineData, pie: pieData });
-  }, [getTransactionsByMonth, selectedMonth]);
+  }, [currentTransactions]);
 
   const handleSelect = (selectedId: string) => {
     transitionChart(() => {
@@ -81,9 +76,8 @@ const ChartViewer = () => {
   );
 
   const isNoDataAvailable = useMemo(
-    () =>
-      chartData.pie?.length === 0 || Object.keys(chartData.line).length === 0,
-    [chartData]
+    () => currentTransactions.length === 0,
+    [currentTransactions]
   );
 
   const renderCharts = useCallback(() => {
@@ -126,23 +120,29 @@ const ChartViewer = () => {
 
   return (
     <GestureHandlerRootView className="flex-1">
-      <View className="gap-3 flex-1 items-center justify-start pt-2 bg-light-background dark:bg-dark-background">
+      <View className="gap-3 items-center justify-start pt-2 bg-light-background dark:bg-dark-background">
         <Selector
           options={options}
           onSelect={handleSelect}
           selectedId={selectedChart}
         />
 
-        <View className="overflow-hidden w-full items-center bg-light-surface dark:bg-dark-surface rounded-3xl">
+        <View className="overflow-hidden w-full h-72 items-center bg-light-surface dark:bg-dark-surface rounded-3xl">
           <ScrollView
             horizontal
-            pagingEnabled
             showsHorizontalScrollIndicator={true}
             onScroll={handleScroll}
             scrollEventThrottle={16}
             ref={scrollViewRef}
           >
-            <Animated.View style={{ width: screenWidth, opacity }}>
+            <Animated.View
+              style={{
+                width: screenWidth,
+                opacity,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
               {renderCharts()}
             </Animated.View>
           </ScrollView>

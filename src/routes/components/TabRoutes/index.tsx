@@ -51,7 +51,7 @@ const TabRoutes: React.FC = () => (
         name={key}
         component={screen}
         options={{
-          header: () => <Header title={key} />,
+          headerShown: false,
         }}
       />
     ))}

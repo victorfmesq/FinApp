@@ -55,17 +55,21 @@ export const calculatePieData = (items: Transaction[]) => {
     { incomeTotal: 0, expenseTotal: 0 }
   );
 
+  const total = totals.expenseTotal + totals.incomeTotal;
+  const incomePercent = (totals.incomeTotal / total) * 100;
+  const expensepercent = 100 - incomePercent;
+
   return [
     {
-      name: 'Receitas',
-      population: totals.incomeTotal,
+      name: '%',
+      population: parseFloat(incomePercent.toFixed(2)),
       color: theme.finance.income,
       legendFontColor: theme.light.textSecondary,
       legendFontSize: 15,
     },
     {
-      name: 'Despesas',
-      population: totals.expenseTotal,
+      name: '%',
+      population: parseFloat(expensepercent.toFixed(2)),
       color: theme.finance.expense,
       legendFontColor: theme.light.textSecondary,
       legendFontSize: 15,

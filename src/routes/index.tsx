@@ -6,6 +6,7 @@ import LoginScreen from '../screens/LoginScreen';
 import TabRoutes from './components/TabRoutes';
 import { RootStackParamList, RoutesConfig, StackScreenNames } from './types';
 import EditScreen from '../screens/EditScreen';
+import Header from '../components/Header/TabRoutesHeader';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -20,7 +21,10 @@ const routes: RoutesConfig = {
   },
   HomeTabs: {
     component: TabRoutes,
-    options: { headerShown: false, gestureEnabled: false },
+    options: {
+      gestureEnabled: false,
+      header: () => <Header />,
+    },
   },
   Edit: {
     component: EditScreen,

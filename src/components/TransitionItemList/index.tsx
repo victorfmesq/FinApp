@@ -59,14 +59,11 @@ const TransitionItemList = ({
   variant: 'read' | 'manage';
 }) => {
   const [selected, setSelected] = useState<string>('');
-  const { getTransactionsByMonth, selectedMonth, deleteTransaction } =
-    useTransactions();
+  const { deleteTransaction, currentTransactions } = useTransactions();
 
   const { navigate, addListener } = useNavigation<EditScreenNavigationProp>();
 
-  const transactionItems = transformTransactions(
-    getTransactionsByMonth(selectedMonth, new Date().getFullYear().toString())
-  );
+  const transactionItems = transformTransactions(currentTransactions);
 
   useEffect(() => {
     const blurListener = addListener('blur', () => {
@@ -133,7 +130,7 @@ const TransitionItemList = ({
 
   return (
     <FlatList
-      className="flex-1 bg-light-surface dark:bg-dark-surface rounded-t-3xl"
+      className="bg-light-surface dark:bg-dark-surface rounded-t-3xl"
       data={transactionItems}
       keyExtractor={item => item.id}
       initialNumToRender={10}

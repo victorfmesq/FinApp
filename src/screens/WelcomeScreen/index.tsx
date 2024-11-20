@@ -7,7 +7,7 @@ import { ScreenProps } from '../../routes/types';
 type WelcomeScreenProps = ScreenProps<'Welcome'>;
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => (
-  <View className="flex-1 items-center justify-center bg-light-background dark:bg-dark-background">
+  <View className="flex-1 items-center justify-center bg-light-background dark:bg-dark-background px-4">
     {/* <Image
       source={require('../../assets/logo.png')}
       className="mb-6 w-32 h-32"
@@ -17,7 +17,10 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => (
       Bem-vindo ao FinApp
     </Text>
 
-    <Button title="Começar" onPress={() => navigation.navigate('Login')} />
+    <Button
+      title="Começar"
+      onPress={() => navigation.navigate('HomeTabs', { screen: 'Home' })}
+    />
   </View>
 );
 
