@@ -55,8 +55,8 @@ const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
       if (!existingItems || Object.keys(existingItems).length === 0) {
         // const mockItems = generateMockItems(100);
 
-        setTransactions([]);
-        saveData([]);
+        setTransactions({});
+        saveData({});
       } else {
         setTransactions(existingItems);
       }

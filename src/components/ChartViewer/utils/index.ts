@@ -2,6 +2,10 @@ import { Transaction } from '../../../contexts/providers/TransactionsProvider/ty
 import { theme } from '../../../themes';
 
 export const calculateLineData = (items: Transaction[]) => {
+  if (items.length === 0) {
+    return undefined;
+  }
+
   const dailyTotals = items.reduce(
     (totals, item) => {
       const day = new Date(item.date).getDate();
@@ -42,6 +46,10 @@ export const calculateLineData = (items: Transaction[]) => {
 };
 
 export const calculatePieData = (items: Transaction[]) => {
+  if (items.length === 0) {
+    return undefined;
+  }
+
   const totals = items.reduce(
     (acc, item) => {
       if (item.type === 'income') {

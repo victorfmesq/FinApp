@@ -1,3 +1,4 @@
+import 'react-native-get-random-values';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   View,
@@ -29,6 +30,7 @@ const TransactionFormScreen: React.FC<TransactionFormScreenProps> = ({
   const [type, setType] = useState<'income' | 'expense'>('income');
   const [date, setDate] = useState<Date>(new Date());
   const [showTypeSelector, setShowTypeSelector] = useState<boolean>(false);
+  const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
 
   const { addTransaction, updateTransaction } = useTransactions();
   const { goBack } = useNavigation();
@@ -50,7 +52,7 @@ const TransactionFormScreen: React.FC<TransactionFormScreenProps> = ({
 
     const newTransaction = {
       id: uuidv4(),
-      name,
+      name: name.trim(),
       amount: Number(amount),
       type,
       date,
@@ -72,7 +74,7 @@ const TransactionFormScreen: React.FC<TransactionFormScreenProps> = ({
 
     const updatedTransaction = {
       ...transaction,
-      name,
+      name: name.trim(),
       amount: Number(amount),
       type,
       date,
@@ -107,12 +109,54 @@ const TransactionFormScreen: React.FC<TransactionFormScreenProps> = ({
     return disableCreation || disabledEdition;
   }, [isEditing, transaction, name, amount, type, date]);
 
+  const onDateChange = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      setDate(selectedDate);
+    }
+  };
+
+  const renderDatePicker = () => {
+    if (Platform.OS === 'ios') {
+      return (
+        <DateTimePicker
+          value={date}
+          mode="date"
+          locale="pt-BR"
+          display="spinner"
+          maximumDate={new Date()}
+          onChange={onDateChange}
+        />
+      );
+    }
+
+    return (
+      <View>
+        <Button
+          title="Selecionar Período"
+          onPress={() => setShowDatePicker(true)}
+        />
+
+        {showDatePicker && (
+          <DateTimePicker
+            value={date}
+            locale="pt-BR"
+            mode="date"
+            display="spinner"
+            onChange={onDateChange}
+            maximumDate={new Date()}
+          />
+        )}
+      </View>
+    );
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1 bg-light-background dark:bg-dark-background"
+      className="flex-1 h-full bg-light-background dark:bg-dark-background"
     >
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="p-4">
+      <ScrollView className="flex-1 p-4">
         <Text className="text-xl font-bold mb-6 text-center">
           {isEditing ? 'Editar Transação' : 'Adicionar Transação'}
         </Text>
@@ -120,7 +164,7 @@ const TransactionFormScreen: React.FC<TransactionFormScreenProps> = ({
         <InputField
           placeholder="Nome da transação"
           value={name}
-          onChangeText={text => setName(text.trim())}
+          onChangeText={text => setName(text)}
         />
 
         <InputField
@@ -204,16 +248,7 @@ const TransactionFormScreen: React.FC<TransactionFormScreenProps> = ({
 
         <View className="mb-4">
           <Text className="mb-2 font-medium">Data</Text>
-          <DateTimePicker
-            value={date}
-            mode="date"
-            display="spinner"
-            onChange={(event, selectedDate) => {
-              if (selectedDate) {
-                setDate(selectedDate);
-              }
-            }}
-          />
+          {renderDatePicker()}
         </View>
 
         <Button

@@ -19,7 +19,7 @@ const HomeScreen = () => {
             <ChartViewer />
           </View>
 
-          <View className="flex-[1] mt-[-6rem]">
+          <View className="flex-[1] mt-[-12rem]">
             <TransitionItemList variant="read" />
           </View>
         </>
